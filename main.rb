@@ -12,7 +12,7 @@ class App
 
   def init_game
     puts 'Enter your name:'
-    name = gets.strip.chomp
+    name = gets.strip.chomp.capitalize
     raise if name.empty?
     player = Player.new(name, BANKROLL_AMOUNT)
     dealer = Player.new('Dealer', BANKROLL_AMOUNT)

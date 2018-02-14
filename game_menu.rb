@@ -14,9 +14,6 @@ class GameMenu < Menu
       name: 'Showdown',
       action: :handle_showdown
     },
-    'i' => {
-      name: 'Score'
-    },
     '0' => {
       name: 'Quit Game',
       action: :exit!
@@ -38,21 +35,23 @@ class GameMenu < Menu
   private
 
   def render
-    start_new_game if @game.finished?
-    puts "Your cards: #{@game.player_hand}, score: #{@game.player_hand.value}"
-    puts "Dealer cards: #{@game.dealer_hand}, score: #{@game.dealer_hand.value}"
+    start_new_game if @game.showdown?
+    puts "Your cards: #{@game.player.hand}, score: #{@game.player.score}"
+    puts "Dealer cards: #{@game.dealer.hand}, score: #{@game.dealer.score}"
     super
   end
 
   def show_results
-    puts "Your cards: #{@game.player_hand}, score: #{@game.player_hand.value}"
-    puts "Dealer cards: #{@game.dealer_hand}, score: #{@game.dealer_hand.value}"
+    puts "Your cards: #{@game.player.hand}, score: #{@game.player.score}"
+    puts "Dealer cards: #{@game.dealer.hand}, score: #{@game.dealer.score}"
+    winner = @game.winner
+    puts winner ? "#{winner.name} wins!" : 'DRAW!'
   end
 
   def start_new_game
     show_results
     puts 'Starting new game...'
-    # @game = Game.new
+    @game.start_new_game
   end
 
   def handle_hit
