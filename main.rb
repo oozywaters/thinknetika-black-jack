@@ -8,12 +8,6 @@ class App
   end
 
   def run
-    # print 'Hello! Please, Enter Your Name: '
-    # @username = gets.chomp
-    deck = Deck.new
-    player_hand = Hand.new(deck.deal(3))
-    puts player_hand.to_s
-    puts player_hand.value
     @menu.display
   end
 end

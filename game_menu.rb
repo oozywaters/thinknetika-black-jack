@@ -1,4 +1,5 @@
 require_relative 'menu'
+require_relative 'game'
 
 class GameMenu < Menu
   STRUCTURE = {
@@ -11,8 +12,8 @@ class GameMenu < Menu
       action: :handle_stand,
     },
     '3' => {
-      name: 'Open Cards',
-      action: :handle_open_cards
+      name: 'Showdown',
+      action: :handle_showdown
     },
     'i' => {
       name: 'Score'
@@ -22,6 +23,10 @@ class GameMenu < Menu
       action: :exit!
     }
   }.freeze
+
+  def initialize
+    @game = Game.new
+  end
 
   def title
     'Your turn:'
@@ -33,16 +38,34 @@ class GameMenu < Menu
 
   private
 
+  def render
+    start_new_game if @game.finished?
+    puts "Your cards: #{@game.player_hand}, score: #{@game.player_hand.value}"
+    puts "Dealer cards: #{@game.dealer_hand}, score: #{@game.dealer_hand.value}"
+    super
+  end
+
+  def show_results
+    puts "Your cards: #{@game.player_hand}, score: #{@game.player_hand.value}"
+    puts "Dealer cards: #{@game.dealer_hand}, score: #{@game.dealer_hand.value}"
+  end
+
+  def start_new_game
+    show_results
+    puts 'Starting new game...'
+    @game = Game.new
+  end
+
   def handle_hit
-    puts 'Hit'
+    @game.hit
   end
 
   def handle_stand
-    puts 'Stand'
+    @game.stand
   end
 
-  def handle_open_cards
-    puts 'Open Cards'
+  def handle_showdown
+    @game.showdown
   end
 
   def exit!

@@ -10,7 +10,7 @@ class Deck
     @cards = build_deck
   end
 
-  def deal(amount)
+  def deal(amount = 1)
     cards.pop(amount)
   end
 
