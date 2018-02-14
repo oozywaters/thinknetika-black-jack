@@ -4,7 +4,7 @@ require_relative 'hand'
 class Game
   attr_reader :player_hand, :dealer_hand
 
-  def initialize
+  def initialize(player, dealer)
     @deck = Deck.new
     @player_hand = Hand.new(@deck.deal(2))
     @dealer_hand = Hand.new(@deck.deal(2))

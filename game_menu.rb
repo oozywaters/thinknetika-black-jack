@@ -1,5 +1,4 @@
 require_relative 'menu'
-require_relative 'game'
 
 class GameMenu < Menu
   STRUCTURE = {
@@ -24,8 +23,8 @@ class GameMenu < Menu
     }
   }.freeze
 
-  def initialize
-    @game = Game.new
+  def initialize(game)
+    @game = game
   end
 
   def title
@@ -53,7 +52,7 @@ class GameMenu < Menu
   def start_new_game
     show_results
     puts 'Starting new game...'
-    @game = Game.new
+    # @game = Game.new
   end
 
   def handle_hit
