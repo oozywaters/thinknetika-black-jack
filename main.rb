@@ -1,7 +1,12 @@
 require_relative 'deck'
 require_relative 'hand'
+require_relative 'game_menu'
 
 class App
+  def initialize
+    @menu = GameMenu.new
+  end
+
   def run
     # print 'Hello! Please, Enter Your Name: '
     # @username = gets.chomp
@@ -9,17 +14,7 @@ class App
     player_hand = Hand.new(deck.deal(3))
     puts player_hand.to_s
     puts player_hand.value
-  end
-
-  private
-
-  def start_game
-    puts "Player's cards: "
-  end
-
-  def display_cards(cards)
-    cards.each { |card| print card.to_s }
-    puts ''
+    @menu.display
   end
 end
 
