@@ -1,11 +1,22 @@
 require_relative 'hand'
 
 class Player
-  attr_reader :name, :hand
+  attr_reader :name, :hand, :bankroll
 
   def initialize(name, bankroll)
     @name = name
     @bankroll = bankroll
+  end
+
+  def make_bet(amount)
+    if bankroll > amount
+      @bankroll -= amount
+      amount
+    end
+  end
+
+  def take_bank(amount)
+    @bankroll += amount
   end
 
   def receive_cards(cards)

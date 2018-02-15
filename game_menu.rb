@@ -54,8 +54,9 @@ class GameMenu < Menu
     if @game.finished?
       handle_showdown
     else
-      puts "Your cards: #{@game.player_hand}, score: #{@game.player_score}"
-      puts "Dealer cards: #{@game.dealer_hand}"
+      puts "Your cards: #{@game.player_hand}, score: #{@game.player_score}, bankroll: $#{@game.player_bankroll}"
+      puts "Dealer cards: #{@game.dealer_hand}, bankroll: $#{@game.dealer_bankroll}"
+      puts "Bank: $#{@game.bank}"
       super
     end
   end
@@ -71,7 +72,7 @@ class GameMenu < Menu
     puts "Your cards: #{@game.player_hand}, score: #{@game.player_score}"
     puts "Dealer cards: #{@game.dealer_hand}, score: #{@game.dealer_score}"
     winner = @game.winner
-    puts winner ? "#{winner.name} wins!" : 'DRAW!'
+    puts winner ? "#{winner.name} wins $#{@game.bank}!" : 'DRAW!'
   end
 
   def start_new_game
