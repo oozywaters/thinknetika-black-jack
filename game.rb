@@ -1,6 +1,7 @@
 require_relative 'deck'
 require_relative 'hand'
 
+# Game logic
 class Game
   attr_reader :bank
 
@@ -18,7 +19,6 @@ class Game
   def start_new_game
     @deck = Deck.new
     @bank = 0
-    @winner = nil
     @bank += @player.make_bet(BET_SIZE)
     @bank += @dealer.make_bet(BET_SIZE)
     @player.receive_cards(@deck.deal(2))
@@ -85,17 +85,7 @@ class Game
   end
 
   def winner
-    return unless showdown?
-    @winner ||=
-      if @player.score > BLACK_JACK
-        @dealer if @dealer.score <= BLACK_JACK
-      elsif @player.score == BLACK_JACK
-        @player if @dealer.score != BLACK_JACK
-      elsif @dealer.score > BLACK_JACK
-        @player
-      else
-        @player.score > @dealer.score ? @player : @dealer
-      end
+    @player <=> @dealer
   end
 
   def showdown?
