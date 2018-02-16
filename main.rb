@@ -39,6 +39,7 @@ class App
   end
 
   def on_round_start
+    puts 'Dealing cards...'
     show_info
     @game_menu.display
   end

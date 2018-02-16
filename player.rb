@@ -51,4 +51,8 @@ class Player
   def busted?
     score > BLACK_JACK
   end
+
+  def black_jack?
+    score == BLACK_JACK
+  end
 end

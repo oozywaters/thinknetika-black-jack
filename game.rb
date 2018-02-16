@@ -26,6 +26,7 @@ class Game
     deal_cards
     @second_turn = false
     @showdown = false
+    return open_cards if @player.black_jack?
     on_round_start
   end
 
@@ -101,7 +102,7 @@ class Game
 
   def pass_turn_to_player
     return if @showdown
-    return open_cards if !@player.can_take_card? || second_turn?
+    return open_cards unless @player.can_take_card?
     @second_turn = true
     on_second_turn
   end
