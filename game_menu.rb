@@ -1,14 +1,15 @@
 require_relative 'menu'
 
+# Game menu
 class GameMenu < Menu
-  STRUCTURE = {
+  FIRST_TURN_STRUCTURE = {
     '1' => {
       name: 'Hit',
-      action: :handle_hit,
+      action: :handle_hit
     },
     '2' => {
       name: 'Stand',
-      action: :handle_stand,
+      action: :handle_stand
     },
     '3' => {
       name: 'Showdown',
@@ -30,7 +31,7 @@ class GameMenu < Menu
       action: :open_cards
     },
     '0' => {
-      name: 'Quite Game',
+      name: 'Quit Game',
       action: :exit!
     }
   }.freeze
@@ -40,58 +41,15 @@ class GameMenu < Menu
   end
 
   def title
-    'Your turn:'
+    "Round ##{@game.round} - Your turn:"
   end
 
   def items
     return SECOND_TURN_STRUCTURE if @game.second_turn?
-    STRUCTURE
+    FIRST_TURN_STRUCTURE
   end
 
   private
-
-  def render
-    if @game.finished?
-      handle_showdown
-    else
-      puts "Your cards: #{@game.player_hand}, score: #{@game.player_score}, bankroll: $#{@game.player_bankroll}"
-      puts "Dealer cards: #{@game.dealer_hand}, bankroll: $#{@game.dealer_bankroll}"
-      puts "Bank: $#{@game.bank}"
-      super
-    end
-  end
-
-  def handle_showdown
-    show_results
-    return exit! unless start_new_game
-    puts 'Starting new game...'
-    @game.start_new_game
-  end
-
-  def show_results
-    puts "Your cards: #{@game.player_hand}, score: #{@game.player_score}"
-    puts "Dealer cards: #{@game.dealer_hand}, score: #{@game.dealer_score}"
-    winner = @game.winner
-    puts winner ? "#{winner.name} wins $#{@game.bank}!" : 'DRAW!'
-  end
-
-  def start_new_game
-    @result = false
-    loop do
-      puts 'Do you want to continue? [Y/N]'
-      choice = gets.chomp
-      if choice == 'Y'
-        @result = true
-        break
-      elsif choice == 'N'
-        @result = false
-        break
-      else
-        puts 'There is no such option. Please, try again.'
-      end
-    end
-    @result
-  end
 
   def handle_hit
     @game.hit
@@ -103,10 +61,5 @@ class GameMenu < Menu
 
   def open_cards
     @game.open_cards
-  end
-
-  def exit!
-    puts 'Come Back Soon!'
-    super
   end
 end

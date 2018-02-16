@@ -1,5 +1,6 @@
 require_relative 'card'
 
+# Deck Class - builds deck and shuffles cards
 class Deck
   attr_reader :cards
 

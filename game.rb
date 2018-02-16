@@ -1,30 +1,32 @@
+require 'forwardable'
 require_relative 'deck'
 require_relative 'hand'
 
 # Game logic
 class Game
-  attr_reader :bank
+  extend Forwardable
+  def_delegators :@ui, :on_round_start, :on_round_end, :on_showdown, :on_second_turn, :on_game_over
 
-  BLACK_JACK = 21
+  attr_reader :bank, :round
+
   BET_SIZE = 10
 
-  def initialize(player, dealer)
+  def initialize(player, dealer, ui)
     @player = player
     @dealer = dealer
-    @bank = 0
-    @showdown = false
-    start_new_game
+    @round = 0
+    @ui = ui
   end
 
-  def start_new_game
-    @deck = Deck.new
+  def start_new_round
+    return on_game_over if over?
+    @round += 1
     @bank = 0
-    @bank += @player.make_bet(BET_SIZE)
-    @bank += @dealer.make_bet(BET_SIZE)
-    @player.receive_cards(@deck.deal(2))
-    @dealer.receive_cards(@deck.deal(2))
+    make_bets
+    deal_cards
     @second_turn = false
     @showdown = false
+    on_round_start
   end
 
   def hit
@@ -36,7 +38,7 @@ class Game
   def stand
     return if @showdown
     dealer_play
-    second_turn
+    pass_turn_to_player
   end
 
   def dealer_play
@@ -68,12 +70,6 @@ class Game
     @player.bankroll
   end
 
-  def second_turn
-    return if @showdown
-    return open_cards if !@player.can_take_card? || second_turn?
-    @second_turn = true
-  end
-
   def open_cards
     @showdown = true
     if winner
@@ -82,18 +78,48 @@ class Game
       @player.take_bank(@bank / 2)
       @dealer.take_bank(@bank / 2)
     end
+    on_showdown(winner)
+    end_round
+  end
+
+  def second_turn?
+    @second_turn
+  end
+
+  private
+
+  def deal_cards
+    @deck = Deck.new
+    @player.cards = @deck.deal(2)
+    @dealer.cards = @deck.deal(2)
+  end
+
+  def make_bets
+    @bank += @player.make_bet(BET_SIZE)
+    @bank += @dealer.make_bet(BET_SIZE)
+  end
+
+  def pass_turn_to_player
+    return if @showdown
+    return open_cards if !@player.can_take_card? || second_turn?
+    @second_turn = true
+    on_second_turn
   end
 
   def winner
     @player <=> @dealer
   end
 
+  def end_round
+    over? ? on_game_over(winner) : on_round_end
+  end
+
   def showdown?
     @showdown
   end
 
-  def second_turn?
-    @second_turn
+  def over?
+    @player.bankroll < BET_SIZE || @dealer.bankroll < BET_SIZE
   end
 
   alias finished? showdown?

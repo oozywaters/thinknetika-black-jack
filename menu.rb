@@ -17,11 +17,11 @@ class Menu
     render until @close
   end
 
-  protected
-
   def close!
     @close = true
   end
+
+  protected
 
   def render
     puts title
@@ -52,7 +52,5 @@ class Menu
     end
   end
 
-  def exit!
-    @close = true
-  end
+  alias exit! close!
 end

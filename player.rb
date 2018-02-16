@@ -1,5 +1,6 @@
 require_relative 'hand'
 
+# Player class
 class Player
   attr_reader :name, :hand, :bankroll
 
@@ -11,17 +12,16 @@ class Player
   end
 
   def make_bet(amount)
-    if bankroll > amount
-      @bankroll -= amount
-      amount
-    end
+    return 0 if amount > bankroll
+    @bankroll -= amount
+    amount
   end
 
   def take_bank(amount)
     @bankroll += amount
   end
 
-  def receive_cards(cards)
+  def cards=(cards)
     @hand = Hand.new(cards)
   end
 
@@ -41,6 +41,8 @@ class Player
     return if score == other.score
     if busted?
       other unless other.busted?
+    elsif other.busted?
+      self
     else
       score > other.score ? self : other
     end

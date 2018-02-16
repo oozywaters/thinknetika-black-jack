@@ -1,3 +1,4 @@
+# Card Class - represents card and calculates value
 class Card
   attr_reader :rank, :suit
 

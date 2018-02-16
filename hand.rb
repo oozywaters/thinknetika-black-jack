@@ -1,3 +1,4 @@
+# Hand Class
 class Hand
   attr_reader :cards
 
