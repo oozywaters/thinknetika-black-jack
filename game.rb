@@ -29,18 +29,25 @@ class Game
 
   def pass_turn_to_player
     return if @showdown
-    return open_cards unless @player.can_take_card?
+    return open_cards unless @player.hand.can_take_card?
     @second_turn = true
     @table.on_second_turn
   end
 
   def open_cards
     @showdown = true
-    @table.on_player_won(winner)
+    winner ? @table.on_player_won(winner) : @table.on_draw
   end
 
   def winner
-    @player <=> @dealer
+    return if @player.score == @dealer.score
+    if @player.busted?
+      @dealer unless @dealer.busted?
+    elsif @dealer.busted?
+      @player
+    else
+      @player.score > @dealer.score ? @player : @dealer
+    end
   end
 
   def showdown?

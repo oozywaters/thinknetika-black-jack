@@ -11,11 +11,16 @@ class Hand
   end
 
   def add_card(card)
+    return unless can_take_card?
     return unless card.is_a?(Card)
     @cards << card if @cards.size < 3
   end
 
   def to_s
     @cards.map(&:to_s).join
+  end
+
+  def can_take_card?
+    cards.size < 3
   end
 end

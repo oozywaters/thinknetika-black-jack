@@ -75,23 +75,25 @@ class Table
     @dealer.cards = @deck.deal(2)
   end
 
-  def deal_card_to_player(player)
-    player.take_card(*@deck.deal)
-  end
-
   def make_bets(bet_size)
     @bank += @player.make_bet(bet_size)
     @bank += @dealer.make_bet(bet_size)
   end
 
+  def deal_card_to_player(player)
+    player.take_card(*@deck.deal)
+  end
+
   def on_player_won(winner)
-    if winner
-      winner.take_bank(@bank)
-    else
-      @player.take_bank(@bank / 2)
-      @dealer.take_bank(@bank / 2)
-    end
-    on_showdown(winner: winner, bank: @bank)
+    winner.take_bank(@bank)
+    on_showdown(winner: winner, bank: bank)
+    @bank = 0
+  end
+
+  def on_draw
+    @player.take_bank(bank / 2)
+    @dealer.take_bank(bank / 2)
+    on_showdown(winner: nil, bank: bank)
     @bank = 0
   end
 end
