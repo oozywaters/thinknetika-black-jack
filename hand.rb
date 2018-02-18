@@ -7,9 +7,8 @@ class Hand
   end
 
   def add_card(card)
-    return unless can_take_card?
     return unless card.is_a?(Card)
-    @cards << card if @cards.size < 3
+    @cards << card if can_take_card?
   end
 
   def to_s
