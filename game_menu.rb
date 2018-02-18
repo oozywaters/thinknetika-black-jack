@@ -36,30 +36,30 @@ class GameMenu < Menu
     }
   }.freeze
 
-  def initialize(game)
-    @game = game
+  def initialize(table)
+    @table = table
   end
 
   def title
-    "Round ##{@game.round} - Your turn:"
+    "Round ##{@table.round} - Your turn:"
   end
 
   def items
-    return SECOND_TURN_STRUCTURE if @game.second_turn?
+    return SECOND_TURN_STRUCTURE if @table.second_turn?
     FIRST_TURN_STRUCTURE
   end
 
   private
 
   def handle_hit
-    @game.hit
+    @table.hit
   end
 
   def handle_stand
-    @game.stand
+    @table.stand
   end
 
   def open_cards
-    @game.open_cards
+    @table.open_cards
   end
 end

@@ -1,5 +1,5 @@
 require_relative 'player'
-require_relative 'game'
+require_relative 'table'
 require_relative 'game_menu'
 
 # Main App Class - manages ui and game
@@ -8,34 +8,12 @@ class App
 
   def initialize
     puts 'Welcome to BlackJack!'
-    @game = init_game
-    @game_menu = GameMenu.new(@game)
+    @table = init_table
+    @game_menu = GameMenu.new(@table)
   end
 
   def run
-    @game.start_new_round
-  end
-
-  private
-
-  def init_game
-    puts 'Enter your name:'
-    name = gets.strip.chomp.capitalize
-    raise if name.empty?
-    player = Player.new(name, BANKROLL_AMOUNT)
-    dealer = Player.new('Dealer', BANKROLL_AMOUNT)
-    Game.new(player, dealer, self)
-  rescue RuntimeError
-    puts 'Name cannot be blank. Please, try again.'
-    retry
-  end
-
-  def show_info
-    puts '------------------------------------------------'
-    puts "| Your cards: #{@game.player_hand}, score: #{@game.player_score}, bankroll: $#{@game.player_bankroll}"
-    puts "| Dealer cards: #{@game.dealer_hand}, bankroll: $#{@game.dealer_bankroll}"
-    puts "| Bank: $#{@game.bank}"
-    puts '------------------------------------------------'
+    @table.start_new_round
   end
 
   def on_round_start
@@ -44,19 +22,20 @@ class App
     @game_menu.display
   end
 
+  def on_showdown(winner:, bank:)
+    puts '------------------------------------------------'
+    puts "| Your cards: #{@table.player_hand}, score: #{@table.player_score}"
+    puts "| Dealer cards: #{@table.dealer_hand}, score: #{@table.dealer_score}"
+    puts winner ? "| #{winner.name} wins $#{bank}!" : '| DRAW!'
+    puts '------------------------------------------------'
+  end
+
   def on_round_end
     prompt_for_new_round
   end
 
-  def on_showdown(winner)
-    puts '------------------------------------------------'
-    puts "| Your cards: #{@game.player_hand}, score: #{@game.player_score}"
-    puts "| Dealer cards: #{@game.dealer_hand}, score: #{@game.dealer_score}"
-    puts winner ? "| #{winner.name} wins $#{@game.bank}!" : '| DRAW!'
-    puts '------------------------------------------------'
-  end
-
   def on_second_turn
+    puts 'On second turn'
     show_info
   end
 
@@ -69,6 +48,28 @@ class App
     @game_menu.close!
     puts 'GAME OVER'
     puts "#{winner.name} won all the money!"
+  end
+
+  private
+
+  def init_table
+    puts 'Enter your name:'
+    name = gets.strip.chomp.capitalize
+    raise if name.empty?
+    player = Player.new(name, BANKROLL_AMOUNT)
+    dealer = Player.new('Dealer', BANKROLL_AMOUNT)
+    Table.new(player, dealer, self)
+  rescue RuntimeError
+    puts 'Name cannot be blank. Please, try again.'
+    retry
+  end
+
+  def show_info
+    puts '------------------------------------------------'
+    puts "| Your cards: #{@table.player_hand}, score: #{@table.player_score}, bankroll: $#{@table.player_bankroll}"
+    puts "| Dealer cards: #{@table.dealer_hand}, bankroll: $#{@table.dealer_bankroll}"
+    puts "| Bank: $#{@table.bank}"
+    puts '------------------------------------------------'
   end
 
   def prompt_for_new_round
