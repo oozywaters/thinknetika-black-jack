@@ -88,13 +88,11 @@ class Table
   def on_player_won(winner)
     winner.take_bank(@bank)
     on_showdown(winner: winner, bank: bank)
-    @bank = 0
   end
 
   def on_draw
     @player.take_bank(bank / 2)
     @dealer.take_bank(bank / 2)
     on_showdown(winner: nil, bank: bank)
-    @bank = 0
   end
 end

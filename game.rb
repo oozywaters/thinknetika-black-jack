@@ -22,20 +22,13 @@ class Game
   end
 
   def hit
-    @table.deal_card_to_player(@player)
+    deal_card_to_player(@player)
     stand
   end
 
   def stand
-    dealer_play
+    @dealer.play(self)
     pass_turn_to_player
-  end
-
-  def pass_turn_to_player
-    return if @showdown
-    return open_cards unless @player.hand.can_take_card?
-    @second_turn = true
-    @table.on_second_turn
   end
 
   def open_cards
@@ -43,11 +36,39 @@ class Game
     winner ? @table.on_player_won(winner) : @table.on_draw
   end
 
+  def deal_card_to_player(player)
+    @table.deal_card_to_player(player)
+  end
+
+  def player_score
+    calculate_score(@player)
+  end
+
+  def dealer_score
+    calculate_score(@dealer)
+  end
+
+  def calculate_score(player)
+    calculate_hand_value(player.hand)
+  end
+
+  def calculate_hand_value(hand)
+    hand.cards.reduce(0) { |sum, card| sum + calculate_card_value(card, sum) }
+  end
+
+  def calculate_card_value(card, current_score = 0)
+    if card.ace?
+      return current_score < 11 ? ACE_MAX_VALUE : ACE_MIN_VALUE
+    end
+    return FACE_VALUE if card.face?
+    card.rank.to_i
+  end
+
   def winner
     return if player_score == dealer_score
-    if player_busted?
-      @dealer unless dealer_busted?
-    elsif dealer_busted?
+    if busted?(@player)
+      @dealer unless busted?(@dealer)
+    elsif busted?(@dealer)
       @player
     else
       player_score > dealer_score ? @player : @dealer
@@ -62,20 +83,8 @@ class Game
     @second_turn
   end
 
-  def player_score
-    calculate_hand_value(@player.hand)
-  end
-
-  def dealer_score
-    calculate_hand_value(@dealer.hand)
-  end
-
-  def player_busted?
-    player_score > BLACK_JACK
-  end
-
-  def dealer_busted?
-    dealer_score > BLACK_JACK
+  def busted?(player)
+    calculate_score(player) > BLACK_JACK
   end
 
   def over?
@@ -84,19 +93,10 @@ class Game
 
   private
 
-  def dealer_play
-    @table.deal_card_to_player(@dealer) if dealer_score < 17
-  end
-
-  def calculate_hand_value(hand)
-    hand.cards.reduce(0) { |sum, card| sum + calculate_card_value(card, sum) }
-  end
-
-  def calculate_card_value(card, current_score = 0)
-    if card.ace?
-      return current_score < 11 ? ACE_MAX_VALUE : ACE_MIN_VALUE
-    end
-    return FACE_VALUE if card.face?
-    card.rank.to_i
+  def pass_turn_to_player
+    return if @showdown
+    return open_cards unless @player.hand.can_take_card?
+    @second_turn = true
+    @table.on_second_turn
   end
 end

@@ -1,4 +1,5 @@
 require_relative 'player'
+require_relative 'dealer'
 require_relative 'table'
 require_relative 'game_menu'
 
@@ -32,13 +33,7 @@ class App
   end
 
   def on_second_turn
-    puts 'On second turn'
     show_info
-  end
-
-  def on_quit_game
-    @game_menu.close!
-    puts 'See You Later!'
   end
 
   def on_rebuy(player, min_bankroll)
@@ -53,7 +48,7 @@ class App
     name = gets.strip.chomp.capitalize
     raise if name.empty?
     player = Player.new(name, BANKROLL_AMOUNT)
-    dealer = Player.new('Dealer', BANKROLL_AMOUNT)
+    dealer = Dealer.new(BANKROLL_AMOUNT)
     Table.new(player, dealer, self)
   rescue RuntimeError
     puts 'Name cannot be blank. Please, try again.'
@@ -82,6 +77,11 @@ class App
         puts 'There is no such option. Please, try again.'
       end
     end
+  end
+
+  def on_quit_game
+    @game_menu.close!
+    puts 'See You Later!'
   end
 end
 
