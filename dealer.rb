@@ -1,5 +1,6 @@
 require_relative 'player'
 
+# Dealer AI logic
 class Dealer < Player
   def initialize(bankroll)
     super('Dealer', bankroll)
