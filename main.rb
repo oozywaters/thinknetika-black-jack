@@ -28,9 +28,6 @@ class App
     puts "| Dealer cards: #{@table.dealer_hand}, score: #{@table.dealer_score}"
     puts winner ? "| #{winner.name} wins $#{bank}!" : '| DRAW!'
     puts '------------------------------------------------'
-  end
-
-  def on_round_end
     prompt_for_new_round
   end
 
@@ -44,10 +41,9 @@ class App
     puts 'See You Later!'
   end
 
-  def on_game_over(winner)
+  def on_rebuy(player, min_bankroll)
+    puts "Player #{player.name} has insufficient bankroll ($#{min_bankroll} required). Please, rebuy."
     @game_menu.close!
-    puts 'GAME OVER'
-    puts "#{winner.name} won all the money!"
   end
 
   private

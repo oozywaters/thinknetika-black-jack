@@ -1,4 +1,7 @@
+# Game Class represents game logic
 class Game
+  BET_SIZE = 10
+
   def initialize(player, dealer, table)
     @player = player
     @dealer = dealer
@@ -6,10 +9,12 @@ class Game
   end
 
   def start_new_round
+    return @table.rebuy(BET_SIZE) if over?
+    @table.make_bets(BET_SIZE)
     @table.deal_cards
-    @table.make_bets
     @second_turn = false
     @showdown = false
+    yield
   end
 
   def hit
@@ -31,14 +36,7 @@ class Game
 
   def open_cards
     @showdown = true
-    if winner
-      winner == @player ? @table.on_player_won : @table.on_player_lost
-    else
-      @table.on_draw
-    end
-    @table.on_round_end
-    # on_showdown(winner)
-    # end_round
+    @table.on_player_won(winner)
   end
 
   def winner
@@ -51,6 +49,10 @@ class Game
 
   def second_turn?
     @second_turn
+  end
+
+  def over?
+    @player.bankroll < BET_SIZE || @dealer.bankroll < BET_SIZE
   end
 
   private

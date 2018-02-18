@@ -5,11 +5,9 @@ require_relative 'game'
 # Table logic
 class Table
   extend Forwardable
-  def_delegators :@ui, :on_round_start, :on_round_end, :on_showdown, :on_second_turn, :on_game_over
+  def_delegators :@ui, :on_round_start, :on_round_end, :on_showdown, :on_second_turn, :on_rebuy
 
   attr_reader :bank, :round
-
-  BET_SIZE = 10
 
   def initialize(player, dealer, ui)
     @player = player
@@ -22,18 +20,7 @@ class Table
 
   def start_new_round
     @round += 1
-    @game.start_new_round
-    on_round_start
-    # # return on_game_over if over?
-    # @round += 1
-    # @bank = 0
-    # make_bets
-    # deal_cards
-    # @game.start_new_round(@deck) { on_round_start }
-    # # @second_turn = false
-    # # @showdown = false
-    # # return open_cards if @player.black_jack?
-    # # on_round_start
+    @game.start_new_round { on_round_start }
   end
 
   def hit
@@ -46,6 +33,11 @@ class Table
 
   def open_cards
     @game.open_cards
+  end
+
+  def rebuy(bet_size)
+    return on_rebuy(@player, bet_size) if @player.bankroll < bet_size
+    on_rebuy(@dealer, bet_size)
   end
 
   def dealer_hand
@@ -87,37 +79,19 @@ class Table
     player.take_card(*@deck.deal)
   end
 
-  def make_bets
-    @bank += @player.make_bet(BET_SIZE)
-    @bank += @dealer.make_bet(BET_SIZE)
+  def make_bets(bet_size)
+    @bank += @player.make_bet(bet_size)
+    @bank += @dealer.make_bet(bet_size)
   end
 
-  def on_player_won
-    @player.take_bank(@bank)
-    on_showdown(winner: @player, bank: @bank)
+  def on_player_won(winner)
+    if winner
+      winner.take_bank(@bank)
+    else
+      @player.take_bank(@bank / 2)
+      @dealer.take_bank(@bank / 2)
+    end
+    on_showdown(winner: winner, bank: @bank)
     @bank = 0
-  end
-
-  def on_player_lost
-    @dealer.take_bank(@bank)
-    on_showdown(winner: @dealer, bank: @bank)
-    @bank = 0
-  end
-
-  def on_draw
-    @player.take_bank(BET_SIZE)
-    @dealer.take_bank(BET_SIZE)
-    on_showdown(winner: nil, bank: @bank)
-    @bank = 0
-  end
-
-  private
-
-  def end_round
-    over? ? on_game_over(winner) : on_round_end
-  end
-
-  def over?
-    @player.bankroll < BET_SIZE || @dealer.bankroll < BET_SIZE
   end
 end
