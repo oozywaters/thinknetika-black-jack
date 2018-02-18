@@ -1,6 +1,10 @@
 # Game Class represents game logic
 class Game
+  BLACK_JACK = 21
   BET_SIZE = 10
+  FACE_VALUE = 10
+  ACE_MIN_VALUE = 1
+  ACE_MAX_VALUE = 11
 
   def initialize(player, dealer, table)
     @player = player
@@ -40,13 +44,13 @@ class Game
   end
 
   def winner
-    return if @player.score == @dealer.score
-    if @player.busted?
-      @dealer unless @dealer.busted?
-    elsif @dealer.busted?
+    return if player_score == dealer_score
+    if player_busted?
+      @dealer unless dealer_busted?
+    elsif dealer_busted?
       @player
     else
-      @player.score > @dealer.score ? @player : @dealer
+      player_score > dealer_score ? @player : @dealer
     end
   end
 
@@ -58,6 +62,22 @@ class Game
     @second_turn
   end
 
+  def player_score
+    calculate_hand_value(@player.hand)
+  end
+
+  def dealer_score
+    calculate_hand_value(@dealer.hand)
+  end
+
+  def player_busted?
+    player_score > BLACK_JACK
+  end
+
+  def dealer_busted?
+    dealer_score > BLACK_JACK
+  end
+
   def over?
     @player.bankroll < BET_SIZE || @dealer.bankroll < BET_SIZE
   end
@@ -65,6 +85,18 @@ class Game
   private
 
   def dealer_play
-    @table.deal_card_to_player(@dealer) if @dealer.score < 17
+    @table.deal_card_to_player(@dealer) if dealer_score < 17
+  end
+
+  def calculate_hand_value(hand)
+    hand.cards.reduce(0) { |sum, card| sum + calculate_card_value(card, sum) }
+  end
+
+  def calculate_card_value(card, current_score = 0)
+    if card.ace?
+      return current_score < 11 ? ACE_MAX_VALUE : ACE_MIN_VALUE
+    end
+    return FACE_VALUE if card.face?
+    card.rank.to_i
   end
 end

@@ -6,10 +6,6 @@ class Hand
     @cards = cards
   end
 
-  def value
-    @cards.reduce(0) { |sum, card| sum + card.get_value(sum) }
-  end
-
   def add_card(card)
     return unless can_take_card?
     return unless card.is_a?(Card)

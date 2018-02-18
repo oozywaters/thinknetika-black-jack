@@ -4,8 +4,6 @@ require_relative 'hand'
 class Player
   attr_reader :name, :hand, :bankroll
 
-  BLACK_JACK = 21
-
   def initialize(name, bankroll)
     @name = name
     @bankroll = bankroll
@@ -29,19 +27,7 @@ class Player
     @hand.add_card(card)
   end
 
-  def score
-    @hand&.value || 0
-  end
-
   def can_take_card?
     @hand.cards.size < 3
-  end
-
-  def busted?
-    score > BLACK_JACK
-  end
-
-  def black_jack?
-    score == BLACK_JACK
   end
 end

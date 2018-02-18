@@ -46,7 +46,7 @@ class Table
   end
 
   def dealer_score
-    @dealer.score
+    @game.dealer_score
   end
 
   def dealer_bankroll
@@ -58,7 +58,7 @@ class Table
   end
 
   def player_score
-    @player.score
+    @game.player_score
   end
 
   def player_bankroll
@@ -76,6 +76,7 @@ class Table
   end
 
   def make_bets(bet_size)
+    @bank = 0
     @bank += @player.make_bet(bet_size)
     @bank += @dealer.make_bet(bet_size)
   end
