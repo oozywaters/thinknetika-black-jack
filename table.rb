@@ -9,30 +9,40 @@ class Table
 
   attr_reader :bank, :round
 
+  BET_SIZE = 10
+
   def initialize(player, dealer, ui)
     @player = player
     @dealer = dealer
-    @game = Game.new(player, dealer, self)
+    @game = Game.new(player, dealer)
     @round = 0
     @bank = 0
     @ui = ui
   end
 
   def start_new_round
+    return rebuy(BET_SIZE) if need_rebuy?
+    @showdown = false
+    @second_turn = false
     @round += 1
-    @game.start_new_round { on_round_start }
+    make_bets(BET_SIZE)
+    deal_cards
+    on_round_start
   end
 
   def hit
-    @game.hit
+    deal_card_to_player(@player)
+    stand
   end
 
   def stand
-    @game.stand
+    @dealer.play(self)
+    pass_turn_to_player
   end
 
   def open_cards
-    @game.open_cards
+    @showdown = true
+    @game.winner ? on_player_won(@game.winner) : on_draw
   end
 
   def rebuy(bet_size)
@@ -41,7 +51,7 @@ class Table
   end
 
   def dealer_hand
-    return @dealer.hand.cards.map { '* ' }.join unless @game.showdown?
+    return @dealer.hand.cards.map { '* ' }.join unless @showdown
     @dealer.hand
   end
 
@@ -66,19 +76,13 @@ class Table
   end
 
   def second_turn?
-    @game.second_turn?
+    @second_turn
   end
 
   def deal_cards
     @deck = Deck.new
     @player.cards = @deck.deal(2)
     @dealer.cards = @deck.deal(2)
-  end
-
-  def make_bets(bet_size)
-    @bank = 0
-    @bank += @player.make_bet(bet_size)
-    @bank += @dealer.make_bet(bet_size)
   end
 
   def deal_card_to_player(player)
@@ -94,5 +98,24 @@ class Table
     @player.take_bank(bank / 2)
     @dealer.take_bank(bank / 2)
     on_showdown(winner: nil, bank: bank)
+  end
+
+  def need_rebuy?
+    @player.bankroll < BET_SIZE || @dealer.bankroll < BET_SIZE
+  end
+
+  private
+
+  def make_bets(bet_size)
+    @bank = 0
+    @bank += @player.make_bet(bet_size)
+    @bank += @dealer.make_bet(bet_size)
+  end
+
+  def pass_turn_to_player
+    return if @showdown
+    return open_cards unless @player.hand.can_take_card?
+    @second_turn = true
+    on_second_turn
   end
 end

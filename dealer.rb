@@ -6,8 +6,8 @@ class Dealer < Player
     super('Dealer', bankroll)
   end
 
-  def play(game)
-    score = game.calculate_hand_value(hand)
-    game.deal_card_to_player(self) if score < 17
+  def play(table)
+    score = table.dealer_score
+    table.deal_card_to_player(self) if score < 17
   end
 end
