@@ -51,4 +51,8 @@ class Game
   def busted?(player)
     calculate_score(player) > BLACK_JACK
   end
+
+  def can_hit?(player)
+    player.hand.cards.size < 3
+  end
 end

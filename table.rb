@@ -5,7 +5,7 @@ require_relative 'game'
 # Table logic
 class Table
   extend Forwardable
-  def_delegators :@ui, :on_round_start, :on_round_end, :on_showdown, :on_second_turn, :on_rebuy
+  def_delegators :@ui, :on_round_start, :on_player_turn, :on_deal_card, :on_showdown, :on_second_turn, :on_rebuy
 
   attr_reader :bank, :round
 
@@ -28,6 +28,7 @@ class Table
     make_bets(BET_SIZE)
     deal_cards
     on_round_start
+    pass_turn_to_player
   end
 
   def hit
@@ -36,18 +37,14 @@ class Table
   end
 
   def stand
-    @dealer.play(self)
-    pass_turn_to_player
+    pass_turn_to_dealer
   end
 
   def open_cards
     @showdown = true
-    @game.winner ? on_player_won(@game.winner) : on_draw
-  end
-
-  def rebuy(bet_size)
-    return on_rebuy(@player, bet_size) if @player.bankroll < bet_size
-    on_rebuy(@dealer, bet_size)
+    winner = @game.winner
+    winner ? winner.take_bank(@bank) : share_bank
+    on_showdown(winner: winner, bank: bank)
   end
 
   def dealer_hand
@@ -79,25 +76,9 @@ class Table
     @second_turn
   end
 
-  def deal_cards
-    @deck = Deck.new
-    @player.cards = @deck.deal(2)
-    @dealer.cards = @deck.deal(2)
-  end
-
   def deal_card_to_player(player)
     player.take_card(*@deck.deal)
-  end
-
-  def on_player_won(winner)
-    winner.take_bank(@bank)
-    on_showdown(winner: winner, bank: bank)
-  end
-
-  def on_draw
-    @player.take_bank(bank / 2)
-    @dealer.take_bank(bank / 2)
-    on_showdown(winner: nil, bank: bank)
+    on_deal_card(player)
   end
 
   def need_rebuy?
@@ -105,6 +86,17 @@ class Table
   end
 
   private
+
+  def deal_cards
+    @deck = Deck.new
+    @player.cards = @deck.deal(2)
+    @dealer.cards = @deck.deal(2)
+  end
+
+  def rebuy(bet_size)
+    return on_rebuy(@player, bet_size) if @player.bankroll < bet_size
+    on_rebuy(@dealer, bet_size)
+  end
 
   def make_bets(bet_size)
     @bank = 0
@@ -114,8 +106,19 @@ class Table
 
   def pass_turn_to_player
     return if @showdown
-    return open_cards unless @player.hand.can_take_card?
+    return open_cards unless @game.can_hit?(@player)
+    on_player_turn
+  end
+
+  def pass_turn_to_dealer
+    return if @showdown
+    @dealer.play(self)
     @second_turn = true
-    on_second_turn
+    pass_turn_to_player
+  end
+
+  def share_bank
+    @player.take_bank(bank / 2)
+    @dealer.take_bank(bank / 2)
   end
 end

@@ -17,10 +17,6 @@ class Menu
     render until @close
   end
 
-  def close!
-    @close = true
-  end
-
   protected
 
   def render
@@ -50,6 +46,10 @@ class Menu
     items.each_with_index do |item, index|
       puts "#{index + 1}) #{item.name}" if item.class.method_defined? :name
     end
+  end
+
+  def close!
+    @close = true
   end
 
   alias exit! close!

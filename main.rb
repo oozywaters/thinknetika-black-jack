@@ -18,9 +18,17 @@ class App
   end
 
   def on_round_start
+    puts 'Making bets...'
     puts 'Dealing cards...'
+  end
+
+  def on_deal_card(player)
+    puts "#{player.name} takes a card..."
+  end
+
+  def on_player_turn
     show_info
-    @game_menu.display
+    GameMenu.new(@table).display
   end
 
   def on_showdown(winner:, bank:)
@@ -32,13 +40,8 @@ class App
     prompt_for_new_round
   end
 
-  def on_second_turn
-    show_info
-  end
-
   def on_rebuy(player, min_bankroll)
     puts "Player #{player.name} has insufficient bankroll ($#{min_bankroll} required). Please, rebuy."
-    @game_menu.close!
   end
 
   private
@@ -80,7 +83,6 @@ class App
   end
 
   def on_quit_game
-    @game_menu.close!
     puts 'See You Later!'
   end
 end

@@ -32,7 +32,7 @@ class GameMenu < Menu
     },
     '0' => {
       name: 'Quit Game',
-      action: :exit!
+      action: :close!
     }
   }.freeze
 
@@ -52,14 +52,17 @@ class GameMenu < Menu
   private
 
   def handle_hit
+    close!
     @table.hit
   end
 
   def handle_stand
+    close!
     @table.stand
   end
 
   def open_cards
+    close!
     @table.open_cards
   end
 end
