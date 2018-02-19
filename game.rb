@@ -53,11 +53,14 @@ class Game
   end
 
   def calculate_hand_value(hand)
-    hand.cards.reduce(0) { |sum, card| sum + calculate_card_value(card, sum) }
+    sorted_cards = hand.cards.sort_by { |card| card.ace? ? 1 : 0 }
+    sorted_cards.reduce(0) { |sum, card| sum + calculate_card_value(card, sum) }
   end
 
   def calculate_card_value(card, current_score = 0)
     if card.ace?
+      # AJA hand should return 12, not 22
+      return -9 if current_score == BLACK_JACK
       return current_score < 11 ? ACE_MAX_VALUE : ACE_MIN_VALUE
     end
     return FACE_VALUE if card.face?
