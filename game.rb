@@ -10,15 +10,7 @@ class Game
     @dealer = dealer
   end
 
-  def player_score
-    calculate_score(@player)
-  end
-
-  def dealer_score
-    calculate_score(@dealer)
-  end
-
-  def calculate_score(player)
+  def calculate_player_score(player)
     calculate_hand_value(player.hand)
   end
 
@@ -38,18 +30,20 @@ class Game
   end
 
   def winner
+    player_score = calculate_player_score(@player)
+    dealer_score = calculate_player_score(@dealer)
     return if player_score == dealer_score
-    if busted?(@player)
-      @dealer unless busted?(@dealer)
-    elsif busted?(@dealer)
+    if busted?(player_score)
+      @dealer unless busted?(dealer_score)
+    elsif busted?(dealer_score)
       @player
     else
       player_score > dealer_score ? @player : @dealer
     end
   end
 
-  def busted?(player)
-    calculate_score(player) > BLACK_JACK
+  def busted?(score)
+    score > BLACK_JACK
   end
 
   def can_hit?(player)

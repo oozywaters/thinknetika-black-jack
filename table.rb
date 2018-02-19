@@ -28,7 +28,7 @@ class Table
     make_bets(BET_SIZE)
     deal_cards
     on_round_start
-    pass_turn_to_player
+    pass_turn_to_player(@player)
   end
 
   def hit
@@ -37,7 +37,9 @@ class Table
   end
 
   def stand
-    pass_turn_to_dealer
+    @second_turn = true
+    pass_turn_to_player(@dealer)
+    pass_turn_to_player(@player)
   end
 
   def open_cards
@@ -53,7 +55,7 @@ class Table
   end
 
   def dealer_score
-    @game.dealer_score
+    @game.calculate_player_score(@dealer)
   end
 
   def dealer_bankroll
@@ -65,7 +67,7 @@ class Table
   end
 
   def player_score
-    @game.player_score
+    @game.calculate_player_score(@player)
   end
 
   def player_bankroll
@@ -104,17 +106,10 @@ class Table
     @bank += @dealer.make_bet(bet_size)
   end
 
-  def pass_turn_to_player
+  def pass_turn_to_player(player)
     return if @showdown
-    return open_cards unless @game.can_hit?(@player)
-    on_player_turn
-  end
-
-  def pass_turn_to_dealer
-    return if @showdown
-    @dealer.play(self)
-    @second_turn = true
-    pass_turn_to_player
+    return open_cards unless @game.can_hit?(player)
+    player == @dealer ? @dealer.play(self) : on_player_turn
   end
 
   def share_bank
