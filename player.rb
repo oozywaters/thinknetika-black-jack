@@ -26,8 +26,4 @@ class Player
   def take_card(card)
     @hand.add_card(card)
   end
-
-  def can_take_card?
-    @hand.cards.size < 3
-  end
 end
